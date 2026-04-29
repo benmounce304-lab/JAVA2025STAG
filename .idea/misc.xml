@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/Weekly Workbooks/07 DB Exercise/resources/cw-db/pom.xml" />
+        <option value="$PROJECT_DIR$/Weekly Workbooks/10 STAG Assignment/resources/cw-stag/pom.xml" />
+        <option value="$PROJECT_DIR$/Weekly Workbooks/04 MVC and Collections/cw-oxo/pom.xml" />
+        <option value="$PROJECT_DIR$/Weekly Workbooks/01 Introduction and Orientation/extras/IntelliJ Template/cw-shapes/pom.xml" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="17" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>
