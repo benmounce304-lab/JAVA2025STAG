@@ -1,12 +1,12 @@
-package edu.uob;
+package edu.uob.GameEntities;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Player extends GameEntity {
 
+    private static final int MAX_HEALTH = 3;
     private Location currentLocation;
-    private ArrayList<Artefact> inventory;
+    private final ArrayList<Artefact> inventory;
     private int health;
 
     public Player(String name, String description) {
@@ -14,7 +14,7 @@ public class Player extends GameEntity {
 
         this.currentLocation = null;
         this.inventory = new ArrayList<>();
-        this.health = 3;
+        this.health = MAX_HEALTH;
     }
 
     public Location getCurrentLocation() {
@@ -30,26 +30,11 @@ public class Player extends GameEntity {
     }
 
     public void setHealth(int newHealth) {
-        if (newHealth > 3) {
-            this.health = 3;
-        } else {
-            this.health = newHealth;
-        }
+        this.health = Math.min(newHealth, MAX_HEALTH);
     }
 
     public ArrayList<Artefact> getInventory() {
         return inventory;
-    }
-
-    public void setInventory(ArrayList<Artefact> inventory) {
-        this.inventory = inventory;
-    }
-
-    public void moveTo(Location location) {
-        if (location == null) {
-            throw new IllegalArgumentException("Location cannot be null");
-        }
-        this.currentLocation = location;
     }
 
     public void addToInventory(Artefact artefact) {
@@ -79,9 +64,6 @@ public class Player extends GameEntity {
     }
 
     public void damage(int amount) {
-        if (amount < 0) {
-            throw new IllegalArgumentException("Damage amount cannot be negative");
-        }
         this.health -= amount;
         if (this.health < 0) {
             this.health = 0;
@@ -89,12 +71,9 @@ public class Player extends GameEntity {
     }
 
     public void heal(int amount) {
-        if (amount < 0) {
-            throw new IllegalArgumentException("Healing amount cannot be negative");
-        }
         this.health += amount;
-        if (this.health > 100) {
-            this.health = 100;
+        if (this.health > MAX_HEALTH) {
+            this.health = MAX_HEALTH;
         }
     }
 }

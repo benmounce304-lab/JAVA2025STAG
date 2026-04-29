@@ -1,4 +1,4 @@
-package edu.uob;
+package edu.uob.GameEntities;
 
 public abstract class GameEntity
 {
@@ -19,10 +19,5 @@ public abstract class GameEntity
     public String getDescription()
     {
         return description;
-    }
-
-    @Override
-    public String toString() {
-        return super.toString();
     }
 }
