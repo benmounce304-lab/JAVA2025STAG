@@ -42,8 +42,6 @@ public class DynamicCMD implements PlayerCMD {
             ItemProducer.produceItems(player, matchedAction, currentRoom, model);
             return CommandResult.success(matchedAction.getNarration());
 
-        } catch (AmbiguousActionException e) {
-            return CommandResult.failure("Be more specific. The command is ambiguous.");
         } catch (MissingEntityException e) {
             return CommandResult.failure("You do not have the required item to do that. You are missing a: " + e.getEntityName());
         } catch (ExtraneousEntityException e) {

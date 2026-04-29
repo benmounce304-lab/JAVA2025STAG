@@ -32,19 +32,31 @@ public class GotoCMD implements PlayerCMD {
      */
     @Override
     public CommandResult execute(Player player, GameModel model) {
-        String destinationName = rawCommand.substring(5).trim();
         Location currentRoom = player.getCurrentLocation();
+        String lowerCmd = rawCommand.toLowerCase();
 
-        if (currentRoom.getPaths().containsKey(destinationName)) {
-            Location newRoom = currentRoom.getPaths().get(destinationName);
-            player.setCurrentLocation(newRoom);
+        int matchCount = 0;
+        String matchedPath = null;
 
-            LookCMD look = new LookCMD();
-            CommandResult lookResult = look.execute(player, model);
-            String message = "You travel to the " + destinationName + ".\n" + lookResult.getMessage();
-            return CommandResult.success(message);
+        for (String path : currentRoom.getPaths()) {
+            if (lowerCmd.matches(".*\\b" + path.toLowerCase() + "\\b.*")) {
+                matchCount++;
+                matchedPath = path;
+            }
         }
 
-        return CommandResult.failure("You cannot go to " + destinationName + " from here.");
+        if (matchCount > 1) {
+            return CommandResult.failure("You can't go in two directions at once. Be more specific!");
+        } else if (matchCount == 0) {
+            return CommandResult.failure("You cannot go there from here.");
+        }
+
+        Location newLocation = model.getAllLocations(matchedPath);
+        if (newLocation != null) {
+            player.setCurrentLocation(newLocation);
+            return CommandResult.success("You travel to the " + matchedPath + ".\n" + newLocation.getDescription());
+        }
+
+        return CommandResult.failure("That location doesn't seem to exist.");
     }
 }

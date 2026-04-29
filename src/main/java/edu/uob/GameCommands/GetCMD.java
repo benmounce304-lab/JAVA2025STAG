@@ -26,15 +26,48 @@ public class GetCMD implements PlayerCMD {
 
     /**
      * Executes the GET command to pick up an artefact from the current location.
-     * First tries exact name matching, then falls back to fuzzy matching.
+     * First checks for ambiguity, then tries exact/fuzzy matching.
      * @param player The player executing the command
      * @param model The game model
      * @return CommandResult indicating success or failure
      */
     @Override
     public CommandResult execute(Player player, GameModel model) {
-        String targetItemName = extractAndNormalizeItemName(rawCommand.substring(4).trim());
         Location currentRoom = player.getCurrentLocation();
+        String lowerCmd = rawCommand.toLowerCase();
+
+        int matchCount = 0;
+        Artefact matchedArtefact = null;
+        Furniture matchedFurniture = null;
+
+        for (Artefact a : currentRoom.getArtefacts()) {
+            if (lowerCmd.matches(".*\\b" + a.getName().toLowerCase() + "\\b.*")) {
+                matchCount++;
+                matchedArtefact = a;
+            }
+        }
+        for (Furniture f : currentRoom.getFurniture()) {
+            if (lowerCmd.matches(".*\\b" + f.getName().toLowerCase() + "\\b.*")) {
+                matchCount++;
+                matchedFurniture = f;
+            }
+        }
+
+        if (matchCount > 1) {
+            return CommandResult.failure("There is more than one thing you can 'get' here. Be more specific!");
+        }
+
+        // If they cleanly mentioned exactly one thing, execute it immediately!
+        if (matchCount == 1) {
+            if (matchedArtefact != null) {
+                currentRoom.removeArtefact(matchedArtefact);
+                player.addToInventory(matchedArtefact);
+                return CommandResult.success("You picked up the " + matchedArtefact.getName() + ".");
+            }
+            return CommandResult.failure("You cannot pick up " + matchedFurniture.getName() + ", it's too heavy for you to carry.");
+        }
+
+        String targetItemName = extractAndNormalizeItemName(rawCommand.substring(4).trim());
 
         for (Artefact a : currentRoom.getArtefacts()) {
             if (a.getName().equalsIgnoreCase(targetItemName)) {
@@ -67,12 +100,6 @@ public class GetCMD implements PlayerCMD {
 
     /**
      * Finds an artefact using fuzzy matching.
-     * Matches if any word from the target appears in the artefact's name.
-     * For example: "razor sharp axe" would match an artefact named "axe".
-     *
-     * @param targetItemName The normalized item name from the command
-     * @param locationOrPlayer The location or player whose artefacts to search
-     * @return The matching Artefact, or null if no match found
      */
     private Artefact findFuzzyMatchArtefact(String targetItemName, Location locationOrPlayer) {
         String[] keywords = targetItemName.toLowerCase().split("\\s+");
@@ -91,11 +118,6 @@ public class GetCMD implements PlayerCMD {
 
     /**
      * Finds furniture using fuzzy matching.
-     * Matches if any word from the target appears in the furniture's name.
-     *
-     * @param targetItemName The normalized item name from the command
-     * @param locationOrPlayer The location or player to search in
-     * @return The matching Furniture, or null if no match found
      */
     private Furniture findFuzzyMatchFurniture(String targetItemName, Location locationOrPlayer) {
         String[] keywords = targetItemName.toLowerCase().split("\\s+");
@@ -114,10 +136,6 @@ public class GetCMD implements PlayerCMD {
 
     /**
      * Normalizes an item name by stripping common articles from the beginning.
-     * For example: "the axe" → "axe", "a sword" → "sword", "an apple" → "apple"
-     *
-     * @param itemName The raw item name from the command
-     * @return The normalized item name without leading articles
      */
     private String extractAndNormalizeItemName(String itemName) {
         String lowerName = itemName.toLowerCase();
