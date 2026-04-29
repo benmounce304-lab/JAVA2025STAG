@@ -34,8 +34,8 @@ public class ActionMatcher {
         int hardWiredCount = 0;
         String[] builtInWords = {"look", "inv", "inventory", "get", "drop", "goto", "health"};
 
-        for (String word : builtInWords) {
-            if (command.matches(".*\\b" + word + "\\b.*")) {
+        for (String trigger : builtInWords) {
+            if (command.matches(".*\\b" + trigger + "\\b.*")) {
                 hardWiredCount++;
             }
         }

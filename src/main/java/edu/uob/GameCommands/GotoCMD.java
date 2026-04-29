@@ -56,9 +56,12 @@ public class GotoCMD implements PlayerCMD {
 
         if (newLocation != null) {
             player.setCurrentLocation(newLocation);
-            return CommandResult.success("You travel to the " + matchedPath + ".\n" + newLocation.getDescription());
-        }
 
-        return CommandResult.failure("That location doesn't seem to exist.");
+            LookCMD lookCommand = new LookCMD();
+            CommandResult lookResult = lookCommand.execute(player, model);
+
+            return CommandResult.success("You travel to the " + matchedPath + ".\n\n" + lookResult.getMessage());
+        }
+        return CommandResult.failure("You cannot go there from here.");
     }
 }
