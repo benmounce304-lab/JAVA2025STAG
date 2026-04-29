@@ -1,7 +1,6 @@
 package edu.uob;
 
 import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
 import java.io.IOException;
 import java.io.File;
 import javax.xml.parsers.ParserConfigurationException;
@@ -39,5 +38,4 @@ final class ActionsFileTests {
           fail("IOException was thrown when attempting to read basic actions file");
       }
   }
-
 }

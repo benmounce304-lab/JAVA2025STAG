@@ -1,9 +1,9 @@
 package edu.uob;
 
-
 import edu.uob.GameExceptions.GameException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.nio.file.Paths;
 import java.io.File;
 
@@ -32,7 +32,7 @@ public class ExtCmdTests {
     }
 
     @Test
-    void testIntegrationCommands() throws GameException{
+    void testIntegrationCommands() throws GameException {
         String response = server.handleCommand("Simon: look").toLowerCase();
         assertTrue(response.contains("a log cabin"), "Did not see description of room in response to look");
         assertTrue(response.contains("magic potion"), "Did not see description of artifacts in response to look");
@@ -203,7 +203,7 @@ public class ExtCmdTests {
     }
 
     @Test
-    void testMoreThanOneValidAction1() throws GameException{
+    void testMoreThanOneValidAction1() throws GameException {
         String response1 = server.handleCommand("Simon: look and inv").toLowerCase();
         assertTrue(response1.contains("ambiguous command: multiple actions match the command"), "Did not see error message in response to multiple actions");
 
@@ -213,7 +213,7 @@ public class ExtCmdTests {
     }
 
     @Test
-    void testMoreThanOneValidAction2() throws GameException{
+    void testMoreThanOneValidAction2() throws GameException {
         String response1 = server.handleCommand("Simon: look and inv").toLowerCase();
         assertTrue(response1.contains("ambiguous command: multiple actions match the command"), "Did not see error message in response to multiple actions");
 
@@ -239,7 +239,7 @@ public class ExtCmdTests {
     }
 
     @Test
-    void testIncompleteCommand() throws GameException{
+    void testIncompleteCommand() throws GameException {
         String response = server.handleCommand("Simon:goto forest").toLowerCase();
         assertTrue(response.contains("you travel to the forest"), "Did not see description of action in response to goto");
 
@@ -248,5 +248,155 @@ public class ExtCmdTests {
 
         String response3 = server.handleCommand("Simon: goto").toLowerCase();
         assertTrue(response3.contains("i don't understand that command"), "The command should not be executed because the command is incomplete");
+    }
+
+    @Test
+    void testMultiplayerInteractions() throws GameException {
+
+        String simonGet = server.handleCommand("Simon: get potion").toLowerCase();
+        assertTrue(simonGet.contains("you picked up the potion"), "Simon should be able to get the potion");
+
+        String bobInv = server.handleCommand("Bob: inv").toLowerCase();
+        assertFalse(bobInv.contains("potion"), "Bob's inventory should NOT contain Simon's potion");
+
+        String bobLook = server.handleCommand("Bob: look").toLowerCase();
+        assertTrue(bobLook.contains("simon"), "Bob should see that Simon is in the room with him");
+        assertFalse(bobLook.contains("magic potion"), "The potion should be gone from the room because Simon has it");
+
+        String simonDrop = server.handleCommand("Simon: drop potion").toLowerCase();
+        assertTrue(simonDrop.contains("you dropped the potion"), "Simon should be able to drop the potion");
+
+        String bobLookAgain = server.handleCommand("Bob: look").toLowerCase();
+        assertTrue(bobLookAgain.contains("magic potion"), "Bob should see the potion Simon just dropped");
+
+        String bobGet = server.handleCommand("Bob: get potion").toLowerCase();
+        assertTrue(bobGet.contains("you picked up the potion"), "Bob should be able to pick up the dropped potion");
+
+        String simonInv = server.handleCommand("Simon: inv").toLowerCase();
+        assertFalse(simonInv.contains("potion"), "Simon should no longer have the potion");
+    }
+
+    @Test
+    void testNegativeEntityInteractions() throws GameException {
+        String dropFail = server.handleCommand("Simon: drop key").toLowerCase();
+        assertTrue(dropFail.contains("you are not carrying"), "Engine should reject dropping items not in inventory");
+
+        String getFurnitureFail = server.handleCommand("Simon: get trapdoor").toLowerCase();
+        assertTrue(getFurnitureFail.contains("too heavy"), "Engine should reject picking up furniture");
+
+        String getLocationFail = server.handleCommand("Simon: get cabin").toLowerCase();
+        assertTrue(getLocationFail.contains("no cabin in this room") || getLocationFail.contains("don't see"), "Engine should reject picking up a location");
+
+        String missingItemFail = server.handleCommand("Simon: open trapdoor").toLowerCase();
+        assertTrue(missingItemFail.contains("you need to mention 'key'"), "Engine should realize Simon is missing the key");
+
+        server.handleCommand("Simon: get axe");
+        String wrongItemFail = server.handleCommand("Simon: open trapdoor with axe").toLowerCase();
+
+        assertTrue(wrongItemFail.contains("cannot use") || wrongItemFail.contains("need to mention 'key'"), "Engine should reject using an axe to open a trapdoor");
+    }
+
+    @Test
+    void testDeathStateAndGraveLooting() throws GameException {
+        server.handleCommand("Simon: get axe");
+        server.handleCommand("Simon: get coin");
+        server.handleCommand("Simon: goto forest");
+        server.handleCommand("Simon: get key");
+        server.handleCommand("Simon: goto cabin");
+        server.handleCommand("Simon: open trapdoor with key");
+        server.handleCommand("Simon: goto cellar");
+
+        String preDeathInv = server.handleCommand("Simon: inv").toLowerCase();
+        assertTrue(preDeathInv.contains("axe"), "Simon should have the axe");
+        assertTrue(preDeathInv.contains("coin"), "Simon should have the coin");
+
+        server.handleCommand("Simon: attack the elf");
+        server.handleCommand("Simon: hit elf");
+        String deathMessage = server.handleCommand("Simon: fight with the elf").toLowerCase();
+        assertTrue(deathMessage.contains("you died"), "Simon should have died");
+
+        String respawnLook = server.handleCommand("Simon: look").toLowerCase();
+        assertTrue(respawnLook.contains("a log cabin"), "Simon should have respawned back in the starting cabin");
+
+        String postDeathInv = server.handleCommand("Simon: inv").toLowerCase();
+        assertFalse(postDeathInv.contains("axe"), "Simon's inventory should be wiped clean of the axe");
+        assertFalse(postDeathInv.contains("coin"), "Simon's inventory should be wiped clean of the coin");
+        assertFalse(postDeathInv.contains("key"), "Simon's inventory should be wiped clean of the key");
+
+        server.handleCommand("Simon: goto cellar");
+        String graveLook = server.handleCommand("Simon: look").toLowerCase();
+
+        assertTrue(graveLook.contains("axe"), "The dropped axe should be lying in the cellar");
+        assertTrue(graveLook.contains("coin"), "The dropped coin should be lying in the cellar");
+
+        String secondFight = server.handleCommand("Simon: hit elf").toLowerCase();
+        assertFalse(secondFight.contains("you died"), "Simon's health should have reset, so he survives the first hit");
+    }
+
+    @Test
+    void testHealthLimits() throws GameException {
+        String startHealth = server.handleCommand("Simon: health").toLowerCase();
+        assertTrue(startHealth.contains("3"), "Simon should start the game with exactly 3 health");
+
+        server.handleCommand("Simon: get potion");
+        server.handleCommand("Simon: drink potion");
+
+        String postPotionHealth = server.handleCommand("Simon: health").toLowerCase();
+        assertTrue(postPotionHealth.contains("3"), "Simon's health should remain capped at 3");
+        assertFalse(postPotionHealth.contains("4"), "Simon's health should never exceed the maximum of 3");
+
+        server.handleCommand("Simon: goto forest");
+        server.handleCommand("Simon: get key");
+        server.handleCommand("Simon: goto cabin");
+        server.handleCommand("Simon: open trapdoor with key");
+        server.handleCommand("Simon: goto cellar");
+
+        server.handleCommand("Simon: hit elf");
+        server.handleCommand("Simon: hit elf");
+
+        String finalHit = server.handleCommand("Simon: hit elf").toLowerCase();
+
+        assertTrue(finalHit.contains("you died"), "Simon should die on exactly the 3rd hit, proving his health was capped at 3!");
+    }
+
+    @Test
+    void testParserEdgeCases() throws GameException {
+        String capsResponse = server.handleCommand("SIMON: GOTO FOREST").toLowerCase();
+        assertTrue(capsResponse.contains("you travel to the forest"), "Engine should ignore capitalization");
+
+        String spaceResponse = server.handleCommand("   Simon    :    get    axe    ").toLowerCase();
+        assertTrue(spaceResponse.contains("you picked up the axe"), "Engine should trim leading/trailing whitespace and handle multiple spaces");
+
+        String noSpaceResponse = server.handleCommand("Simon:look").toLowerCase();
+        assertTrue(noSpaceResponse.contains("a log cabin"), "Engine should correctly split the name and command even without a space after the colon");
+
+        String emptyResponse = server.handleCommand("Simon: ").toLowerCase();
+        assertTrue(emptyResponse.contains("i don't understand") || emptyResponse.contains("ambiguous"), "Engine should safely reject empty commands without throwing an IndexOutOfBoundsException");
+
+        String nothingResponse = server.handleCommand("Simon:").toLowerCase();
+        assertTrue(nothingResponse.contains("i don't understand") || nothingResponse.contains("ambiguous"), "Engine should safely reject purely empty strings without crashing");
+
+        server.handleCommand("Simon: goto forest");
+        String rambleResponse = server.handleCommand("Simon: please can you just get the key for me right now").toLowerCase();
+        assertTrue(rambleResponse.contains("you picked up the key"), "Engine should extract the valid verb and noun from a rambling sentence");
+
+        String gibberishResponse = server.handleCommand("Simon: dance with the dragon").toLowerCase();
+        assertTrue(gibberishResponse.contains("i don't understand that command"), "Engine should politely reject completely unrecognized verbs");
+    }
+
+    @Test
+    void testPathLocking() throws GameException {
+        String earlyGoto = server.handleCommand("Simon: goto cellar").toLowerCase();
+        assertTrue(earlyGoto.contains("you cannot go there") || earlyGoto.contains("doesn't seem to exist"), "Engine should prevent movement on paths that haven't been produced by an action yet");
+    }
+
+    @Test
+    void testReverseString() throws GameException {
+        server.handleCommand("Simon: goto forest");
+        server.handleCommand("Simon: get key");
+        server.handleCommand("Simon: goto cabin");
+
+        String reverseResponse = server.handleCommand("Simon: with the key please open the trapdoor").toLowerCase();
+        assertTrue(reverseResponse.contains("you unlock the door"), "Engine should not care about the order of the nouns and verbs");
     }
 }

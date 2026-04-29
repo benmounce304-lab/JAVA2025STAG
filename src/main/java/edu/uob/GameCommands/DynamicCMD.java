@@ -5,6 +5,7 @@ import edu.uob.GameEngine.GameAction;
 import edu.uob.GameEngine.GameModel;
 import edu.uob.GameEntities.Location;
 import edu.uob.GameEntities.Player;
+import edu.uob.GameExceptions.AmbiguousActionException;
 import edu.uob.GameExceptions.ExtraneousEntityException;
 import edu.uob.GameExceptions.MissingEntityException;
 import edu.uob.GameExceptions.GameException;
