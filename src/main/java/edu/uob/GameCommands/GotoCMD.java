@@ -6,7 +6,6 @@ import edu.uob.GameEngine.GameModel;
 import edu.uob.GameEntities.Player;
 
 /**
-
  * Goto allows players to move between connected locations.
  * Can only travel to locations that paths directly connect.
  * Player automatically looks around the new location after moving,
@@ -17,6 +16,7 @@ public class GotoCMD implements PlayerCMD {
 
     /**
      * Creates a new GotoCMD with the raw command string.
+     *
      * @param rawCommand The command string starting with "goto "
      */
     public GotoCMD(String rawCommand) {
@@ -26,8 +26,9 @@ public class GotoCMD implements PlayerCMD {
     /**
      * Executes the GOTO command to move the player to a connected location.
      * Shows the new location using the LOOK command after a successful movement.
+     *
      * @param player The player executing the command
-     * @param model The game model
+     * @param model  The game model
      * @return CommandResult indicating success or failure
      */
     @Override
@@ -38,7 +39,7 @@ public class GotoCMD implements PlayerCMD {
         int matchCount = 0;
         String matchedPath = null;
 
-        for (String path : currentRoom.getPaths()) {
+        for (String path : currentRoom.getPaths().keySet()) {
             if (lowerCmd.matches(".*\\b" + path.toLowerCase() + "\\b.*")) {
                 matchCount++;
                 matchedPath = path;
@@ -51,7 +52,8 @@ public class GotoCMD implements PlayerCMD {
             return CommandResult.failure("You cannot go there from here.");
         }
 
-        Location newLocation = model.getAllLocations(matchedPath);
+        Location newLocation = model.getAllLocations().get(matchedPath);
+
         if (newLocation != null) {
             player.setCurrentLocation(newLocation);
             return CommandResult.success("You travel to the " + matchedPath + ".\n" + newLocation.getDescription());

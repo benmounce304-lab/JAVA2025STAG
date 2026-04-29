@@ -18,7 +18,6 @@ public class GameController {
 
     /**
      * Creates a new GameController with the specified model.
-     * @param model The game model containing all game state
      */
     public GameController(GameModel model) {
         this.model = model;
@@ -28,9 +27,6 @@ public class GameController {
      * Parses and executes a player command.
      * Handles player creation and delegates to appropriate command handlers.
      * Supports flexible command matching for natural language input.
-     *
-     * @param command The raw command string (format: "PlayerName: command")
-     * @return The result message from executing the command
      */
     public String parseCommand(String command) {
         GameTokenizer tokenizer = new GameTokenizer(command);
@@ -62,13 +58,8 @@ public class GameController {
 
     /**
      * Attempts to match commands that appear anywhere in the sentence.
-     * Supports natural language input like "please can you get the axe"
-     *
-     * @param rawCommand The raw command string
-     * @return A PlayerCMD if a keyword match is found, null otherwise
      */
     private PlayerCMD findFlexibleCommandMatch(String rawCommand) {
-        // Check if command contains " get " keyword with word boundaries
         if (matchesKeywordPattern(rawCommand, "get")) {
             String itemPart = extractAfterKeyword(rawCommand, "get");
             if (!itemPart.isEmpty()) {
@@ -76,7 +67,6 @@ public class GameController {
             }
         }
 
-        // Check if command contains " drop " keyword
         if (matchesKeywordPattern(rawCommand, "drop")) {
             String itemPart = extractAfterKeyword(rawCommand, "drop");
             if (!itemPart.isEmpty()) {
@@ -84,24 +74,17 @@ public class GameController {
             }
         }
 
-        // Check if command contains " goto " keyword
         if (matchesKeywordPattern(rawCommand, "goto")) {
             String destination = extractAfterKeyword(rawCommand, "goto");
             if (!destination.isEmpty()) {
                 return CommandFactory.createCommandHandler("goto " + destination);
             }
         }
-
-        // No flexible match found
         return null;
     }
 
     /**
-     * Checks if the command contains a keyword as a complete word (not as a substring).
-     *
-     * @param command The command string
-     * @param keyword The keyword to search for
-     * @return true if the keyword appears as a complete word in the command
+     * Checks if the command contains a keyword as a complete word.
      */
     private boolean matchesKeywordPattern(String command, String keyword) {
         String pattern = "\\b" + keyword + "\\b";
@@ -110,11 +93,6 @@ public class GameController {
 
     /**
      * Extracts the part of the command after a given keyword.
-     * For example, extractAfterKeyword("please get the axe", "get") returns "the axe"
-     *
-     * @param command The command string
-     * @param keyword The keyword to search after
-     * @return The substring after the keyword, or empty string if not found
      */
     private String extractAfterKeyword(String command, String keyword) {
         String pattern = ".*\\b" + keyword + "\\s+(.*)";
@@ -127,8 +105,6 @@ public class GameController {
     /**
      * Retrieves an existing player by name or creates a new player if not found.
      * New players start in the game's starting room.
-     * @param playerName The name of the player
-     * @return The Player object (existing or newly created)
      */
     private Player retrieveOrCreatePlayer(String playerName) {
         Map<String, Player> allPlayers = model.getAllPlayers();
@@ -139,7 +115,6 @@ public class GameController {
             currentPlayer.setCurrentLocation(model.getStartingRoom());
             model.addPlayer(playerName, currentPlayer);
         }
-
         return currentPlayer;
     }
 }

@@ -13,8 +13,9 @@ public class InvCMD implements PlayerCMD {
 
     /**
      * Executes inventory to display the player's inventory.
+     *
      * @param player The player executing the command
-     * @param model The game model
+     * @param model  The game model
      * @return A CommandResult listing all items in the player's inventory
      */
     @Override

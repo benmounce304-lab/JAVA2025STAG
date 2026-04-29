@@ -3,6 +3,10 @@ package edu.uob.GameEntities;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Represents a location in the game world, which can contain artefacts, furniture, and characters.
+ */
+
 public class Location extends GameEntity {
 
     private final HashMap<String, Location> paths;
@@ -89,7 +93,8 @@ public class Location extends GameEntity {
     }
 
     public void addPath(String direction, Location location) {
-        if (direction == null || location == null) throw new IllegalArgumentException("Direction and location cannot be null");
+        if (direction == null || location == null)
+            throw new IllegalArgumentException("Direction and location cannot be null");
         this.paths.put(direction, location);
     }
 

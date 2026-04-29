@@ -3,6 +3,7 @@ package edu.uob.GameEngine;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
@@ -10,6 +11,9 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.function.Consumer; // <-- NEW IMPORT!
 
+/**
+ * Parses XML action definitions and converts them into GameAction objects.
+ */
 public class ActionParser {
     public ArrayList<GameAction> parseActions(File actionsFile) throws Exception {
         ArrayList<GameAction> parsedActions = new ArrayList<>();
@@ -45,6 +49,9 @@ public class ActionParser {
         return parsedActions;
     }
 
+    /**
+     * Parses and adds entities from an XML group element to a GameAction using a provided Consumer.
+     */
     private void parseAndAddEntities(Element actionElement, String groupName, Consumer<String> addMethod) {
         Element groupElement = (Element) actionElement.getElementsByTagName(groupName).item(0);
         if (groupElement != null) {

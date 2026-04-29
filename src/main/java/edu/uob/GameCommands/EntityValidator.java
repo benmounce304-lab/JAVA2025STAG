@@ -10,6 +10,11 @@ import edu.uob.GameExceptions.GameException;
 
 import java.util.ArrayList;
 
+/**
+ * Validates that the player has the required entities to perform the action.
+ * Throws MissingEntityException if any required entity is missing.
+ * Throws ExtraneousEntityException if any extraneous entity is present.
+ */
 public class EntityValidator {
 
     public static void validateRequiredSubjects(GameAction matchedAction, String command, Player player, Location currentRoom) throws GameException {

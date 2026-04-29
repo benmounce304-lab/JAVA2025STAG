@@ -3,7 +3,7 @@ package edu.uob.GameExceptions;
 import java.io.Serial;
 
 /**
- * Custom exception for game-related errors.
+ * Base class for all game-related exceptions.
  */
 
 public class GameException extends Exception {

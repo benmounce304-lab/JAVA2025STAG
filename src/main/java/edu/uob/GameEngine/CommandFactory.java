@@ -12,8 +12,6 @@ public class CommandFactory {
     /**
      * Creates the appropriate PlayerCMD implementation for the given raw command.
      * Returns null if the command should be handled as a dynamic action.
-     * @param rawCommand The raw command string (already trimmed and validated)
-     * @return A PlayerCMD instance for the command, or null for dynamic commands
      */
     public static PlayerCMD createCommandHandler(String rawCommand) {
         if (rawCommand == null) {
@@ -39,14 +37,11 @@ public class CommandFactory {
         if (rawCommand.startsWith("goto ")) {
             return new GotoCMD(rawCommand);
         }
-
         return null;
     }
 
     /**
      * Checks if the raw command is the special "health" command.
-     * @param rawCommand The raw command string
-     * @return true if the command is "health", false otherwise
      */
     public static boolean isHealthCommand(String rawCommand) {
         return rawCommand != null && rawCommand.equalsIgnoreCase("health");

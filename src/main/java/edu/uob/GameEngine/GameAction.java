@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 
+/**
+ * Represents a game action with triggers, subjects, consumed items, produced items, and narration.
+ * Used to define and execute game actions.
+ */
 public class GameAction
 {
     private final List<String> triggers;

@@ -8,6 +8,12 @@ import edu.uob.GameEntities.Furniture;
 import edu.uob.GameEntities.Location;
 import edu.uob.GameEntities.Player;
 
+/**
+ * Consumes items based on the matched action.
+ * Handles health and moving to other locations.
+ * Handles death and moving to the start room.
+ */
+
 public class ItemConsumer {
     private static final String STORAGE_LOCATION = "storeroom";
     private static final String HEALTH_KEYWORD = "health";
@@ -59,6 +65,9 @@ public class ItemConsumer {
         return null;
     }
 
+    /**
+     * Moves the player to the start room and transfers all items to the start room.
+     */
     private static String handleDeath(Player player, GameModel model) {
         Location deathRoom = player.getCurrentLocation();
 

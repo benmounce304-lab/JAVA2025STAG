@@ -1,11 +1,16 @@
 package edu.uob.GameEngine;
 
+/**
+ * Tokenizes a full command string into player name and raw command components.
+ * Ensures that the command format is valid and contains only characters.
+ */
 public class GameTokenizer {
 
     private final String playerName;
     private final String rawCommand;
     private final boolean isValid;
     private final String errorMessage;
+    private final static int PART_LENGTH = 2;
 
     public GameTokenizer(String fullCommand) {
         if (fullCommand == null) {
@@ -16,8 +21,8 @@ public class GameTokenizer {
             return;
         }
 
-        String[] parts = fullCommand.split(":", 2);
-        if (parts.length < 2) {
+        String[] parts = fullCommand.split(":", PART_LENGTH);
+        if (parts.length < PART_LENGTH) {
             this.isValid = false;
             this.errorMessage = "Invalid command format. Use 'Username: command'";
             this.playerName = null;

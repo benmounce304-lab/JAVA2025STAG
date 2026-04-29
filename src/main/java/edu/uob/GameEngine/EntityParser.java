@@ -14,6 +14,11 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Parses entity definitions from a Graphviz file and constructs game entities.
+ * Handles locations, artefacts, furniture, and characters.
+ */
+
 public class EntityParser {
 
     private Location startingRoom = null;

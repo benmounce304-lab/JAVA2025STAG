@@ -2,6 +2,10 @@ package edu.uob.GameEntities;
 
 import java.util.ArrayList;
 
+/**
+ * Represents a player character in the game, with attributes such as health, inventory, and current location.
+ */
+
 public class Player extends GameEntity {
 
     private static final int MAX_HEALTH = 3;

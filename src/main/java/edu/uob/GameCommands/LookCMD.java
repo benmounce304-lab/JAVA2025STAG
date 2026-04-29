@@ -67,7 +67,6 @@ public class LookCMD implements PlayerCMD {
                 response.append("- ").append(entry.getKey()).append(" (").append(entry.getValue().getName()).append(")\n");
             }
         }
-
         return CommandResult.success(response.toString());
     }
 }

@@ -7,6 +7,12 @@ import edu.uob.GameExceptions.AmbiguousActionException;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Finds the appropriate action based on the command.
+ * Handles ambiguous commands by throwing AmbiguousActionException.
+ * Returns null if no matching action is found.
+ */
+
 public class ActionMatcher {
 
     public static GameAction findMatchingAction(String command, GameModel model) throws AmbiguousActionException {
@@ -25,6 +31,10 @@ public class ActionMatcher {
             }
         }
 
+        if (matchingActions.isEmpty()) {
+            return null;
+        }
+
         int hardWiredCount = 0;
         String[] builtInWords = {"look", "inv", "inventory", "get", "drop", "goto", "health"};
 
@@ -35,13 +45,8 @@ public class ActionMatcher {
         }
 
         if ((matchingActions.size() + hardWiredCount) > 1) {
-            throw new AmbiguousActionException("Ambiguous command: multiple actions match the command.");
+            throw new AmbiguousActionException("ambiguous command: multiple actions match the command");
         }
-
-        if (matchingActions.isEmpty()) {
-            return null;
-        }
-
         return matchingActions.iterator().next();
     }
 }

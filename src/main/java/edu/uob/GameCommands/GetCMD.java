@@ -15,9 +15,11 @@ import edu.uob.GameEntities.Player;
 public class GetCMD implements PlayerCMD {
     private static final String[] ARTICLES = {"the ", "a ", "an "};
     private final String rawCommand;
+    private static final int MAX_COMMAND = 4;
 
     /**
      * Creates a new GetCMD with the raw command string.
+     *
      * @param rawCommand The command string starting with "get "
      */
     public GetCMD(String rawCommand) {
@@ -27,8 +29,9 @@ public class GetCMD implements PlayerCMD {
     /**
      * Executes the GET command to pick up an artefact from the current location.
      * First checks for ambiguity, then tries exact/fuzzy matching.
+     *
      * @param player The player executing the command
-     * @param model The game model
+     * @param model  The game model
      * @return CommandResult indicating success or failure
      */
     @Override
@@ -57,7 +60,6 @@ public class GetCMD implements PlayerCMD {
             return CommandResult.failure("There is more than one thing you can 'get' here. Be more specific!");
         }
 
-        // If they cleanly mentioned exactly one thing, execute it immediately!
         if (matchCount == 1) {
             if (matchedArtefact != null) {
                 currentRoom.removeArtefact(matchedArtefact);
@@ -67,7 +69,7 @@ public class GetCMD implements PlayerCMD {
             return CommandResult.failure("You cannot pick up " + matchedFurniture.getName() + ", it's too heavy for you to carry.");
         }
 
-        String targetItemName = extractAndNormalizeItemName(rawCommand.substring(4).trim());
+        String targetItemName = extractAndNormalizeItemName(rawCommand.substring(MAX_COMMAND).trim());
 
         for (Artefact a : currentRoom.getArtefacts()) {
             if (a.getName().equalsIgnoreCase(targetItemName)) {
@@ -77,11 +79,11 @@ public class GetCMD implements PlayerCMD {
             }
         }
 
-        Artefact fuzzyMatch = findFuzzyMatchArtefact(targetItemName, currentRoom);
-        if (fuzzyMatch != null) {
-            currentRoom.removeArtefact(fuzzyMatch);
-            player.addToInventory(fuzzyMatch);
-            return CommandResult.success("You picked up the " + fuzzyMatch.getName() + ".");
+        Artefact keywordMatch = findArtefactByKeyword(targetItemName, currentRoom);
+        if (keywordMatch != null) {
+            currentRoom.removeArtefact(keywordMatch);
+            player.addToInventory(keywordMatch);
+            return CommandResult.success("You picked up the " + keywordMatch.getName() + ".");
         }
 
         for (Furniture f : currentRoom.getFurniture()) {
@@ -90,18 +92,17 @@ public class GetCMD implements PlayerCMD {
             }
         }
 
-        Furniture fuzzyFurniture = findFuzzyMatchFurniture(targetItemName, currentRoom);
-        if (fuzzyFurniture != null) {
-            return CommandResult.failure("You cannot pick up " + fuzzyFurniture.getName() + ", it's too heavy for you to carry.");
+        Furniture keywordFurniture = findFurnitureByKeyword(targetItemName, currentRoom);
+        if (keywordFurniture != null) {
+            return CommandResult.failure("You cannot pick up " + keywordFurniture.getName() + ", it's too heavy for you to carry.");
         }
-
         return CommandResult.failure("There is no " + targetItemName + " in this room.");
     }
 
     /**
-     * Finds an artefact using fuzzy matching.
+     * Finds artefacts using keyword matching.
      */
-    private Artefact findFuzzyMatchArtefact(String targetItemName, Location locationOrPlayer) {
+    private Artefact findArtefactByKeyword(String targetItemName, Location locationOrPlayer) {
         String[] keywords = targetItemName.toLowerCase().split("\\s+");
 
         for (Artefact a : locationOrPlayer.getArtefacts()) {
@@ -117,9 +118,9 @@ public class GetCMD implements PlayerCMD {
     }
 
     /**
-     * Finds furniture using fuzzy matching.
+     * Finds furniture using keyword matching.
      */
-    private Furniture findFuzzyMatchFurniture(String targetItemName, Location locationOrPlayer) {
+    private Furniture findFurnitureByKeyword(String targetItemName, Location locationOrPlayer) {
         String[] keywords = targetItemName.toLowerCase().split("\\s+");
 
         for (Furniture f : locationOrPlayer.getFurniture()) {
@@ -145,7 +146,6 @@ public class GetCMD implements PlayerCMD {
                 return itemName.substring(article.length()).trim();
             }
         }
-
         return itemName.trim();
     }
 }

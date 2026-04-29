@@ -7,6 +7,9 @@ import edu.uob.GameExceptions.LoadFileException;
 import java.io.File;
 import java.util.*;
 
+/**
+ * Represents the core game model containing all game states and entities.
+ */
 public class GameModel {
     private final HashMap<String, Location> allLocations;
     private final ArrayList<GameAction> allActions;

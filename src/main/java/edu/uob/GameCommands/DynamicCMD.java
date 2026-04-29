@@ -5,7 +5,6 @@ import edu.uob.GameEngine.GameAction;
 import edu.uob.GameEngine.GameModel;
 import edu.uob.GameEntities.Location;
 import edu.uob.GameEntities.Player;
-import edu.uob.GameExceptions.AmbiguousActionException;
 import edu.uob.GameExceptions.ExtraneousEntityException;
 import edu.uob.GameExceptions.MissingEntityException;
 import edu.uob.GameExceptions.GameException;
@@ -21,6 +20,14 @@ public class DynamicCMD implements PlayerCMD {
         this.rawCommand = rawCommand;
     }
 
+    /**
+     * Executes the dynamic command based on the provided player and game model.
+     * Validates entities, consumes required items, and produces results.
+     *
+     * @param player The player executing the command
+     * @param model  The game model containing game state
+     * @return CommandResult indicating success or failure
+     */
     @Override
     public CommandResult execute(Player player, GameModel model) {
         try {
